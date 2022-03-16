@@ -3,8 +3,8 @@ $org = "GoogleContainerTools"
 $skipLocal = $true
 
 # Fix for Powershell default to TLSv1.0
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls, [Net.SecurityProtocolType]::Tls11, [Net.SecurityProtocolType]::Tls12, [Net.SecurityProtocolType]::Ssl3
-[Net.ServicePointManager]::SecurityProtocol = "Tls, Tls11, Tls12, Ssl3"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls11, [Net.SecurityProtocolType]::Tls12
+[Net.ServicePointManager]::SecurityProtocol = "Tls11, Tls12"
 
 $subDirs = Get-ChildItem -Directory -Name
 $userURL = "https://api.github.com/users/" + $org
@@ -22,9 +22,11 @@ Do {
         $URL = $item.clone_url
         if ($skipLocal){
             $localDir = $URL -replace "https://github.com/$org/(.*)\.git",'$1'
-            if ( $subDirs.Contains($localDir) ){
-                Write-Host "($repoCount / $repos) Skipping Local: $localDir" -ForegroundColor Red
-                continue
+            if ($subDirs){
+                if ( $subDirs.Contains($localDir) ){
+                    Write-Host "($repoCount / $repos) Skipping Local: $localDir" -ForegroundColor Red
+                    continue
+                }
             }
         }
         Write-Host "($repoCount / $repos) Cloning: $URL" -ForegroundColor Green
