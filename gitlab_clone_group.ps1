@@ -17,7 +17,7 @@ $subDirs = Get-ChildItem -Directory -Name
 $reqGroupProj = Invoke-WebRequest -Uri $groupProjURL
 # Without auth, Gitlab only returns public repos
 $repos = $reqGroupProj.Headers.'X-Total'
-$pageCount = 0; $repoCount = 0 $skippedLocal = 0 #; $perPage = 20
+$pageCount = 0; $repoCount = 0; $skippedLocal = 0 #; $perPage = 20
 if ($reqGroupProj.StatusCode -eq 200){
 # TODO: Next Page Logic: if ($reqGroupProj.Headers.'X-Next-Page'){write-host "yes"}
 #Do {
