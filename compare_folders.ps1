@@ -1,7 +1,7 @@
 $source_dir = "C:\Users\Foo"
 $dest_dir = "C:\Users\Bar"
 
-
+$RemoveSource = "True"; $RemoveSourceEmptyDirs = "True"
 $sourceFiles = Get-ChildItem $source_dir -Recurse | where { ! $_.PSIsContainer }
 $destFiles = Get-ChildItem $dest_dir -Recurse | where { ! $_.PSIsContainer }
 
@@ -20,11 +20,21 @@ foreach ($sourceObj in $sourceFiles){
             if ($sourceHash -eq $destHash){
                 $matchHash += 1
                 Write-Host "   Hash Match" -ForegroundColor Green
-                Remove-Item $sourceObj.FullName
+                if ($RemoveSource -eq "True"){ Remove-Item $sourceObj.FullName }
             } else {
                 $missHash += 1
                 Write-Host "   Hash Miss" -ForegroundColor Red
             }
         }
+    }
+}
+
+if ($RemoveSourceEmptyDirs -eq "True"){
+    $sourceCheckDirs = Get-ChildItem $source_dir -Recurse | where { $_.PSIsContainer }
+    foreach ($sourceCheckDir in $sourceCheckDirs){
+        if ($sourceCheckDir.GetFiles().Count -eq 0){
+            Write-Host Deleting Emtpy Directory $sourceCheckDir.FullName -ForegroundColor Red
+            Remove-Item $sourceCheckDir.FullName
+        } Else { Write-Host Not Empty $sourceCheckDir.FullName -ForegroundColor Green } 
     }
 }
