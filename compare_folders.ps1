@@ -30,11 +30,24 @@ foreach ($sourceObj in $sourceFiles){
 }
 
 if ($RemoveSourceEmptyDirs -eq "True"){
-    $sourceCheckDirs = Get-ChildItem $source_dir -Recurse | where { $_.PSIsContainer }
-    foreach ($sourceCheckDir in $sourceCheckDirs){
-        if ($sourceCheckDir.GetFiles().Count -eq 0){
-            Write-Host Deleting Emtpy Directory $sourceCheckDir.FullName -ForegroundColor Red
-            Remove-Item $sourceCheckDir.FullName
-        } Else { Write-Host Not Empty $sourceCheckDir.FullName -ForegroundColor Green } 
-    }
+    do {
+        $foundToDel = 0
+        $loopCount += 1
+        # -Force Gets Hidden files, need to start with child folders first (tail recursion)
+        $srcPaths = Get-ChildItem -LiteralPath $source_dir -Recurse -Force -Directory
+        $sortedsrcPaths = $srcPaths | Sort-Object -Property FullName -Descending
+        foreach ($sortedsrcPath in $sortedsrcPaths){
+            if (! $sortedsrcPath.GetDirectories() ){
+                if ($sortedsrcPath.GetFiles().Count -eq 0){
+                    $foundToDel = 1
+                    Write-Host $sortedsrcPath.FullName has no child dirs or files, deleting -ForegroundColor Red
+                    Remove-Item $sortedsrcPath.FullName
+                    sleep 1
+                }
+            }
+        }
+        sleep 3
+        } until ($foundToDel -eq 0)
+        
+    Write-Host Delete took $loopCount loops
 }
