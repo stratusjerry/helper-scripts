@@ -89,6 +89,7 @@ for vscode_ver in vscode_vers:
         content_disp = dl_file.headers.get("Content-Disposition")
         # TESTING
         from email.message import Message # This is a workaround to get the filename from Content-Disposition
+        msg = Message()
         msg['Content-Disposition'] = content_disp
         file_name = msg.get_filename()
         if file_name != expected_file_name:
