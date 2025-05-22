@@ -97,8 +97,9 @@ for vscode_ver in vscode_vers:
         # Below hangs
         with open(full_file_path, "wb") as f:
             for chunk in dl_file.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
+                f.write(chunk)
+                #if chunk:
+                #    f.write(chunk)
     if debug:
         input("Press Enter to continue...")
     time.sleep(sleep_time)
