@@ -52,15 +52,16 @@ $getReleases = Invoke-RestMethod "https://api.github.com/repos/microsoft/vscode/
 #$tagged = Invoke-RestMethod "https://api.github.com/repos/microsoft/vscode/git/tags/10e7355fd691a471ff95902180c81898aea2069c" -Headers $headers
 #$tagged.sha # 10e7355fd691a471ff95902180c81898aea2069c
 #$taggedRelease = Invoke-RestMethod "https://api.github.com/repos/microsoft/vscode/releases/tags/1.61.2" -Headers $headers
-$tagName = ""; $verCommitHash = @{}
+$tagName = ""; $curTag = 0; $verCommitHash = @{}
 foreach ($getRelease in $getReleases){
     $tagName = $getRelease.tag_name
     $tagArray += $tagName
 }
 
 foreach ($tagItem in $tagArray){
+    $curTag++
     $htmlURL = $htmlTagURL + $tagItem
-    Write-IfDebug "Checking Tag: ${tagItem}  URL: ${htmlURL}"
+    Write-IfDebug "Checking Tag ${curTag} of $($tagArray.count) : ${tagItem} URL: ${htmlURL}"
     ## $getTag.object.sha doesn't always equal release commit ID and can return commitIDs that don't exist in the code base. Only 
     ##  reliable way to get the release CommitID (we use this to get vscode-server version) involves parsing the HTML page:
     #$getTag = Invoke-RestMethod "https://api.github.com/repos/microsoft/vscode/git/refs/tags/$tagItem" -Method 'GET' -Headers $headers
@@ -76,10 +77,9 @@ foreach ($tagItem in $tagArray){
     foreach ($allLinkHref in $allLinksHref){
         $linkCounter++
         if ($allLinkHref.href.Contains("vscode/commit/") ){
-            Write-IfDebug "  counter: ${linkCounter} of $($allLinksHref.count)"
-            Write-IfDebug "    href: ${allLinkHref}"
+            Write-IfDebug "  href count: ${linkCounter} of $($allLinksHref.count) match: ${allLinkHref}"
             $tagSHA = $allLinkHref.href -Replace '.*commit/'
-            Write-Host "Tag: $tagItem CommitID: $tagSHA"
+            Write-Host "  Tag: $tagItem CommitID: $tagSHA"
             $linkMatch++
         }
     }
